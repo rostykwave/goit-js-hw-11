@@ -48,12 +48,32 @@ refs.form.addEventListener('submit', onSearch);
 loadMoreButton.refs.button.addEventListener('click', fetchCards);
 
 
+//////////Observer
+const callback = (entries, io) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      console.log(`Спостергаю за id ="${entry.target.id}"`);
+        fetchCards();
+        Notify.info('Loading...');
+    }
+  });
+};
+const options = {
+  rootMargin: '100px',
+  // threshold: 0.5,
+};
+const observer = new IntersectionObserver(callback, options);
+
+const sentinel = document.querySelector('#sentinel');
+// observer.observe(sentinel);
+/////////////////////////////////////////////////////////////////
+
 
 
 function onSearch(e) {
     e.preventDefault();
 
-    loadMoreButton.hide();
+    // loadMoreButton.hide();
 
     photoApiService.query = e.currentTarget.elements.searchQuery.value;
 
@@ -66,17 +86,19 @@ function onSearch(e) {
 
     searchQueryButton.disable();
 
-    fetchCards();
+    // fetchCards();
+
+    observer.observe(sentinel);
 
 }
 
 
 function fetchCards() {
-    loadMoreButton.disable();
+    // loadMoreButton.disable();
 
     photoApiService.fetchCards()
         .then(cards => {
-            loadMoreButton.show();
+            // loadMoreButton.show();
             renderPhotoCards(cards);
             lightbox.refresh();
             searchQueryButton.enable();
